@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - proxy
+
+  dockhand:
+    image: fnsys/dockhand:latest
+    container_name: dockhand
+    restart: unless-stopped
+    expose:
+      - "3000" # internal only
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - dockhand_data:/app/data
+      - ./certificates/combined-ca.crt:/etc/ssl/certs/ca-certificates.crt:ro
+    environment:
+      - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+    networks:
+      - proxy
+
+volumes:
+  dockhand_data:
+  caddy_data:
+  caddy_config:
+
+
+networks:
+  proxy:
+    external: true
