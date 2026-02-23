@@ -65,8 +65,8 @@ TBD
 
 ### Caddy
 
-[Caddy](services/caddy.md) provides a reverse proxy, allowing us to access services via a unique adress, instead of acessing them with a specific port.
+[Caddy](services/caddy.md) provides a reverse proxy, allowing us to access services via a unique adress, instead of accessing them with a specific port.
 
 ### Dockhand
 
-[Dockhand](services/dockhand.md) provides easily acessilbe monitoring of all docker services, ensuring health, providing insight in resource usage and searching for vulnurabilities
+[Dockhand](services/dockhand.md) provides easily accessilbe monitoring of all docker services, ensuring health, providing insight in resource usage and searching for vulnerabilities
