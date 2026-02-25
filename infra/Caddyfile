@@ -5,6 +5,6 @@ dockhand.platform.smith-data.de {
 }
 
 demo.platform.smith-data.de {
-    reverse_proxy nginxdemo:4000
+    reverse_proxy nginxdemo:80
     tls internal
 }
