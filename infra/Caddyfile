@@ -3,8 +3,3 @@ dockhand.platform.smith-data.de {
     reverse_proxy dockhand:3000
     tls internal
 }
-
-demo.platform.smith-data.de {
-    reverse_proxy nginxdemo:80
-    tls internal
-}
