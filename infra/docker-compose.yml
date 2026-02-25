@@ -28,6 +28,15 @@ services:
     networks:
       - proxy
 
+  nginxdemo:
+    image: nginxdemos/hello:latest
+    container_name: nginxdemo
+    restart: unless-stopped
+    ports:
+      - "4000:80"
+    networks:
+      - proxy
+
 volumes:
   dockhand_data:
   caddy_data:
