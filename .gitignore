@@ -5,3 +5,6 @@
 *.cer
 *.der
 *.priv
+
+### deployment ###
+/deployment/config.json

@@ -23,7 +23,7 @@ param (
     [string]$RemotePath,
     
     [Parameter(Mandatory=$false)]
-    [string]$ConfigFile = "deploy.config.json"
+    [string]$ConfigFile = "config.json"
 )
 
 # Configuration

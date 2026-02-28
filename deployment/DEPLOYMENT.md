@@ -18,21 +18,26 @@ No installation needed. Just ensure you have the prerequisites above.
 
 ```powershell
 # Using configuration file (recommended)
-.\deploy.ps1
+.\deployment\deploy.ps1
 
 # Using command line parameters
-.\deploy.ps1 -RemoteUser username -RemoteHost hostname -RemotePath "/path/to/repo"
+.\deployment\deploy.ps1 -RemoteUser username -RemoteHost hostname -RemotePath "/path/to/repo"
 
 # Using custom config file
-.\deploy.ps1 -ConfigFile "custom.config.json"
+.\deployment\deploy.ps1 -ConfigFile "custom.config.json"
 
 # Example with parameters
-.\deploy.ps1 -RemoteUser deploy -RemoteHost my-server.internal -RemotePath "/opt/foss-data-platform"
+.\deployment\deploy.ps1 -RemoteUser deploy -RemoteHost my-server.internal -RemotePath "/opt/foss-data-platform"
 ```
 
 ## Configuration File
 
-Create a `deploy.config.json` file in the same directory as the script:
+1. **Copy the example configuration:**
+   ```powershell
+   Copy-Item deployment\config.example.json deployment\config.json
+   ```
+
+2. **Edit `deployment\config.json`** with your server details:
 
 ```json
 {
@@ -43,6 +48,8 @@ Create a `deploy.config.json` file in the same directory as the script:
     "dockerComposeFile": "docker-compose.yml"
 }
 ```
+
+⚠️ **Important:** The `config.json` file is in `.gitignore` and won't be committed to version control for security.
 
 ## What the Script Does
 

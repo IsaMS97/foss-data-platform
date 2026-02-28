@@ -4,10 +4,11 @@ I've created a comprehensive PowerShell deployment script for your FOSS Data Pla
 
 ## Files Created
 
-1. **`deploy.ps1`** - Main PowerShell deployment script
-2. **`DEPLOYMENT.md`** - Complete documentation
-3. **`deploy.config.json`** - Configuration template
-4. **`DEPLOYMENT_SUMMARY.md`** - This summary
+1. **`deployment/deploy.ps1`** - Main PowerShell deployment script
+2. **`deployment/DEPLOYMENT.md`** - Complete documentation
+3. **`deployment/config.example.json`** - Configuration template (safe to commit)
+4. **`deployment/config.json`** - Actual configuration (in .gitignore)
+5. **`deployment/DEPLOYMENT_SUMMARY.md`** - This summary
 
 ## Features Implemented
 
@@ -102,9 +103,10 @@ The script has been tested and verified to:
 
 ## Next Steps
 
-1. Edit `deploy.config.json` with your server details
-2. Set up SSH key authentication to your remote server
-3. Ensure you're connected to VPN before running
-4. Run `.\[deploy.ps1](deploy.ps1)` to deploy!
+1. **Copy the example config:** `Copy-Item deployment\config.example.json deployment\config.json`
+2. **Edit `deployment\config.json`** with your server details
+3. Set up SSH key authentication to your remote server
+4. Ensure you're connected to VPN before running
+5. Run `.\[deployment\deploy.ps1](deployment/deploy.ps1)` to deploy!
 
 The script is production-ready and handles all the requirements you specified in an elegant, automated way.
