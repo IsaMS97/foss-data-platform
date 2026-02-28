@@ -3,5 +3,6 @@
     "remoteHost": "your-server.internal",
     "remotePath": "/path/to/foss-data-platform",
     "sshPort": 22,
-    "dockerComposeFile": "docker-compose.yml"
+    "dockerComposeFile": "docker-compose.yml",
+    "sshKeyPath": "C:\\Users\\YourUsername\\.ssh\\id_rsa"
 }

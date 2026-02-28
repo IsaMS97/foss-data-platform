@@ -9,7 +9,6 @@ This script automates the deployment process by:
 4. Checking out the same branch and pulling changes
 5. Applying Docker Compose changes
 
-Usage: .\deploy.ps1 -RemoteUser username -RemoteHost hostname -RemotePath "/path/to/repo"
 #>
 
 # Function definitions
@@ -64,11 +63,14 @@ function Test-SSHConnection {
     param(
         [string]$user,
         [string]$hostname,
-        [int]$port
+        [int]$port,
+        [string]$sshKeyPath
     )
     
     try {
-        $connectionTest = ssh -o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=no "$user@$hostname" "echo 'SSH connection successful'" 2>&1
+        $sshTarget = $user + '@' + $hostname
+        $sshCommand = "ssh -i `$sshKeyPath` -o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=no $sshTarget 'echo SSH connection successful'"
+        $connectionTest = iex "$sshCommand 2>&1"
         if ($connectionTest -match "SSH connection successful") {
             Write-ColorText "SSH connection test successful" "Green"
             return $true
@@ -88,7 +90,8 @@ function Deploy-Remote {
         [string]$user,
         [string]$hostname,
         [string]$path,
-        [string]$branch
+        [string]$branch,
+        [string]$sshKeyPath
     )
     
     $sshCommand = @(
@@ -104,7 +107,9 @@ function Deploy-Remote {
     
     try {
         Write-ColorText "Executing remote deployment..." "Blue"
-        $result = ssh "$user@$hostname" "$fullCommand"
+        $sshTarget = $user + '@' + $hostname
+        $sshCommand = "ssh -i `$sshKeyPath` -o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=no $sshTarget '$fullCommand'"
+        $result = iex "$sshCommand"
         
         Write-ColorText "Remote deployment completed:" "Green"
         Write-ColorText "$result" "White"
@@ -133,6 +138,21 @@ try {
     $RemotePath = $config.remotePath
     $SSH_PORT = $config.sshPort
     $DOCKER_COMPOSE_FILE = $config.dockerComposeFile
+    $SSH_KEY_PATH = $config.sshKeyPath
+    
+    # Convert Windows path to Unix-style for SSH if needed
+    if ($SSH_KEY_PATH -match '\\') {
+        # Simple conversion for common case: C:\path\to\file -> /mnt/c/path/to/file
+        $SSH_KEY_PATH = $SSH_KEY_PATH -replace '\\', '/'
+        if ($SSH_KEY_PATH -like 'C:*') {
+            $SSH_KEY_PATH = $SSH_KEY_PATH -replace 'C:', '/c'
+            $SSH_KEY_PATH = '/mnt' + $SSH_KEY_PATH
+        } elseif ($SSH_KEY_PATH -like 'D:*') {
+            $SSH_KEY_PATH = $SSH_KEY_PATH -replace 'D:', '/d'
+            $SSH_KEY_PATH = '/mnt' + $SSH_KEY_PATH
+        }
+        # Add more drive letters as needed
+    }
     
     Write-ColorText "Loaded configuration from $ConfigFile" "Blue"
 } catch {
@@ -161,13 +181,13 @@ $currentBranch = Get-CurrentBranch
 
 # Test SSH connection
 Write-ColorText "Testing SSH connection to $RemoteUser@$RemoteHost..." "Blue"
-if (-not (Test-SSHConnection -user $RemoteUser -hostname $RemoteHost -port $SSH_PORT)) {
+if (-not (Test-SSHConnection -user $RemoteUser -hostname $RemoteHost -port $SSH_PORT -sshKeyPath $SSH_KEY_PATH)) {
     exit 1
 }
 
 # Deploy to remote
 Write-ColorText "Starting deployment to $RemoteUser@$RemoteHost..." "Blue"
-if (Deploy-Remote -user $RemoteUser -hostname $RemoteHost -path $RemotePath -branch $currentBranch) {
+if (Deploy-Remote -user $RemoteUser -hostname $RemoteHost -path $RemotePath -branch $currentBranch -sshKeyPath $SSH_KEY_PATH) {
     Write-ColorText "Deployment completed successfully!" "Green"
 } else {
     Write-ColorText "Deployment failed!" "Red"
