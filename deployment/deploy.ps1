@@ -103,9 +103,10 @@ function Deploy-Remote {
         "cd $path",
         "git fetch origin",
         "git checkout $branch",
-        "git pull origin $branch",
+        "git reset --hard origin/$branch",
         "docker compose -f $DOCKER_COMPOSE_FILE pull",
-        "docker compose -f $DOCKER_COMPOSE_FILE up -d --remove-orphans"
+        "docker compose -f $DOCKER_COMPOSE_FILE up -d --remove-orphans",
+        "echo 'DOCKER_DEPLOYMENT_STATUS:$?'"
     )
     
     $fullCommand = $sshCommand -join "; "
