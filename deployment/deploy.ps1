@@ -12,38 +12,25 @@ This script automates the deployment process by:
 #>
 
 # Function definitions
-function Write-ColorText {
+function Write-Log {
     param (
-        [string]$Text,
-        [string]$Color = "White"
+        [string]$Text
     )
     
-    $colors = @{
-        "Red" = "31"
-        "Green" = "32"
-        "Yellow" = "33"
-        "Blue" = "34"
-        "White" = "37"
-    }
-    
-    if ($colors.ContainsKey($Color)) {
-        Write-Host "`e[${color}m$Text`e[0m"
-    } else {
-        Write-Host $Text
-    }
+    Write-Host $Text
 }
 
 function Test-GitStatus {
     try {
         $status = git status --porcelain
         if ($status) {
-            Write-ColorText "ERROR: You have uncommitted changes:" "Red"
+            Write-Log "ERROR: You have uncommitted changes:"
             git status
             exit 1
         }
         return $true
     } catch {
-        Write-ColorText "ERROR: Failed to check git status: $_" "Red"
+        Write-Log "ERROR: Failed to check git status: $_"
         exit 1
     }
 }
@@ -51,10 +38,10 @@ function Test-GitStatus {
 function Get-CurrentBranch {
     try {
         $branch = git rev-parse --abbrev-ref HEAD
-        Write-ColorText "Current branch: $branch" "Blue"
+        Write-Log "Current branch: $branch"
         return $branch
     } catch {
-        Write-ColorText "ERROR: Failed to get current branch: $_" "Red"
+        Write-Log "ERROR: Failed to get current branch: $_"
         exit 1
     }
 }
@@ -72,15 +59,15 @@ function Test-SSHConnection {
         $sshCommand = "ssh -i `$sshKeyPath` -o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=no $sshTarget 'echo SSH connection successful'"
         $connectionTest = iex "$sshCommand 2>&1"
         if ($connectionTest -match "SSH connection successful") {
-            Write-ColorText "SSH connection test successful" "Green"
+            Write-Log "SSH connection test successful"
             return $true
         } else {
-            Write-ColorText "ERROR: SSH connection failed. Please make sure you're connected to VPN and SSH is accessible." "Red"
-            Write-ColorText "Connection test output: $connectionTest" "Yellow"
+            Write-Log "ERROR: SSH connection failed. Please make sure you're connected to VPN and SSH is accessible."
+            Write-Log "Connection test output: $connectionTest"
             return $false
         }
     } catch {
-        Write-ColorText "ERROR: SSH connection test failed: $_" "Red"
+        Write-Log "ERROR: SSH connection test failed: $_"
         return $false
     }
 }
@@ -116,7 +103,7 @@ function Deploy-Remote {
         
         return $true
     } catch {
-        Write-ColorText "ERROR: Remote deployment failed: $_" "Red"
+        Write-Log "ERROR: Remote deployment failed: $_"
         return $false
     }
 }
@@ -125,8 +112,8 @@ function Deploy-Remote {
 $ConfigFile = "config.json"
 
 if (-not (Test-Path $ConfigFile)) {
-    Write-ColorText "ERROR: Configuration file $ConfigFile not found" "Red"
-    Write-ColorText "Please copy config.example.json to config.json and edit it with your settings" "Yellow"
+    Write-Log "ERROR: Configuration file $ConfigFile not found"
+    Write-Log "Please copy config.example.json to config.json and edit it with your settings"
     exit 1
 }
 
@@ -154,44 +141,44 @@ try {
         # Add more drive letters as needed
     }
     
-    Write-ColorText "Loaded configuration from $ConfigFile" "Blue"
+    Write-Log "Loaded configuration from $ConfigFile"
 } catch {
-    Write-ColorText "ERROR: Failed to load configuration file: $_" "Red"
+    Write-Log "ERROR: Failed to load configuration file: $_"
     exit 1
 }
 
 # Validate configuration
 if (-not $RemoteUser -or -not $RemoteHost -or -not $RemotePath) {
-    Write-ColorText "ERROR: Missing required configuration values" "Red"
-    Write-ColorText "Please check your $ConfigFile file" "Yellow"
+    Write-Log "ERROR: Missing required configuration values"
+    Write-Log "Please check your $ConfigFile file"
     exit 1
 }
 
 # Main execution
-Write-ColorText "=== FOSS Data Platform Deployment ===" "Blue"
+Write-Log "=== FOSS Data Platform Deployment ==="
 
 # Check for uncommitted changes
-Write-ColorText "Checking git status..." "Blue"
+Write-Log "Checking git status..."
 if (Test-GitStatus) {
-    Write-ColorText "Git working tree is clean" "Green"
+    Write-Log "Git working tree is clean"
 }
 
 # Get current branch
 $currentBranch = Get-CurrentBranch
 
 # Test SSH connection
-Write-ColorText "Testing SSH connection to $RemoteUser@$RemoteHost..." "Blue"
+Write-Log "Testing SSH connection to $RemoteUser@$RemoteHost..."
 if (-not (Test-SSHConnection -user $RemoteUser -hostname $RemoteHost -port $SSH_PORT -sshKeyPath $SSH_KEY_PATH)) {
     exit 1
 }
 
 # Deploy to remote
-Write-ColorText "Starting deployment to $RemoteUser@$RemoteHost..." "Blue"
+Write-Log "Starting deployment to $RemoteUser@$RemoteHost..."
 if (Deploy-Remote -user $RemoteUser -hostname $RemoteHost -path $RemotePath -branch $currentBranch -sshKeyPath $SSH_KEY_PATH) {
-    Write-ColorText "Deployment completed successfully!" "Green"
+    Write-Log "Deployment completed successfully!"
 } else {
-    Write-ColorText "Deployment failed!" "Red"
+    Write-Log "Deployment failed!"
     exit 1
 }
 
-Write-ColorText "=== Deployment Complete ===" "Blue"
+Write-Log "=== Deployment Complete ==="
