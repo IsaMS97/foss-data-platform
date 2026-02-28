@@ -112,12 +112,12 @@ function Get-CurrentBranch {
 function Test-SSHConnection {
     param(
         [string]$user,
-        [string]$host,
+        [string]$hostname,
         [int]$port
     )
     
     try {
-        $connectionTest = ssh -o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=no "$user@$host" "echo 'SSH connection successful'" 2>&1
+        $connectionTest = ssh -o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=no "$user@$hostname" "echo 'SSH connection successful'" 2>&1
         if ($connectionTest -match "SSH connection successful") {
             Write-ColorText "SSH connection test successful" "Green"
             return $true
@@ -135,7 +135,7 @@ function Test-SSHConnection {
 function Deploy-Remote {
     param(
         [string]$user,
-        [string]$host,
+        [string]$hostname,
         [string]$path,
         [string]$branch
     )
@@ -153,7 +153,7 @@ function Deploy-Remote {
     
     try {
         Write-ColorText "Executing remote deployment..." "Blue"
-        $result = ssh "$user@$host" "$fullCommand"
+        $result = ssh "$user@$hostname" "$fullCommand"
         
         Write-ColorText "Remote deployment completed:" "Green"
         Write-ColorText "$result" "White"
@@ -179,13 +179,13 @@ $currentBranch = Get-CurrentBranch
 
 # Test SSH connection
 Write-ColorText "Testing SSH connection to $RemoteUser@$RemoteHost..." "Blue"
-if (-not (Test-SSHConnection -user $RemoteUser -host $RemoteHost -port $SSH_PORT)) {
+if (-not (Test-SSHConnection -user $RemoteUser -hostname $RemoteHost -port $SSH_PORT)) {
     exit 1
 }
 
 # Deploy to remote
 Write-ColorText "Starting deployment to $RemoteUser@$RemoteHost..." "Blue"
-if (Deploy-Remote -user $RemoteUser -host $RemoteHost -path $RemotePath -branch $currentBranch) {
+if (Deploy-Remote -user $RemoteUser -hostname $RemoteHost -path $RemotePath -branch $currentBranch) {
     Write-ColorText "Deployment completed successfully!" "Green"
 } else {
     Write-ColorText "Deployment failed!" "Red"
