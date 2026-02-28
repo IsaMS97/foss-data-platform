@@ -1,0 +1,7 @@
+{
+    "remoteUser": "your_username",
+    "remoteHost": "your-server.internal",
+    "remotePath": "/path/to/foss-data-platform",
+    "sshPort": 22,
+    "dockerComposeFile": "docker-compose.yml"
+}
