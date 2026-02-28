@@ -1,10 +1,22 @@
-# Dockhand service
+# Global configuration - disable automatic HTTPS for all sites
+{
+    auto_https disable
+}
+
+# Dockhand service - manually enable HTTPS
 dockhand.platform.smith-data.de {
     reverse_proxy dockhand:3000
     tls internal
+    # Manually enable HTTPS redirect for dockhand only
+    @http {
+        protocol http
+    }
+    handle @http {
+        redir https://{host}{uri} 301
+    }
 }
 
-# Simple website - HTTP only by binding to port 80 explicitly
-website.platform.smith-data.de:80 {
+# Simple website - HTTP only
+website.platform.smith-data.de {
     reverse_proxy http://simple-website:80
 }
