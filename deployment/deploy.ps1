@@ -28,6 +28,24 @@ function Test-GitStatus {
             git status
             exit 1
         }
+        
+        # Check if current branch is pushed to remote
+        $currentBranch = git rev-parse --abbrev-ref HEAD
+        $localSha = git rev-parse HEAD
+        $remoteSha = git rev-parse "$currentBranch@{upstream}" 2>$null
+        
+        if (-not $remoteSha) {
+            Write-Log "ERROR: No upstream branch configured. Please push your branch first."
+            exit 1
+        }
+        
+        if ($localSha -ne $remoteSha) {
+            Write-Log "ERROR: Local branch is not pushed to remote. Please push your changes first."
+            Write-Log "Local commit: $localSha"
+            Write-Log "Remote commit: $remoteSha"
+            exit 1
+        }
+        
         return $true
     } catch {
         Write-Log "ERROR: Failed to check git status: $_"
