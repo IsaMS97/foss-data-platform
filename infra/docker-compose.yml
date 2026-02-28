@@ -28,17 +28,6 @@ services:
     networks:
       - proxy
 
-  simple-website:
-    image: nginx:alpine
-    container_name: simple-website
-    restart: unless-stopped
-    expose:
-      - "80" # internal only
-    volumes:
-      - ./website:/usr/share/nginx/html:ro
-    networks:
-      - proxy
-
 volumes:
   dockhand_data:
   caddy_data:
