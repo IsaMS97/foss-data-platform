@@ -4,11 +4,13 @@ dockhand.platform.smith-data.de {
     tls internal
 }
 
-# Simple website - try sharing the same internal CA as dockhand
+# Simple website - HTTP only, explicitly disable HTTPS
 website.platform.smith-data.de {
-    reverse_proxy simple-website:80
-    tls internal {
-        # Try to use the same internal CA as dockhand
-        # This should share certificate storage
+    reverse_proxy http://simple-website:80
+    @https {
+        protocol https
+    }
+    handle @https {
+        respond "Please use HTTP for this service" 400
     }
 }
