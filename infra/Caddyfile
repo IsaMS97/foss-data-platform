@@ -1,11 +1,13 @@
-# Dockhand service
+# Global configuration
+auto_https disable website.platform.smith-data.de
+
+# Dockhand service (keep TLS as it works)
 dockhand.platform.smith-data.de {
     reverse_proxy dockhand:3000
     tls internal
 }
 
-# Simple website
+# Simple website - HTTP only
 website.platform.smith-data.de {
-    reverse_proxy simple-website:80
-    tls internal
+    reverse_proxy http://simple-website:80
 }
