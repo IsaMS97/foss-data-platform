@@ -106,7 +106,7 @@ function Deploy-Remote {
         "git reset --hard origin/$branch",
         "docker compose -f $DOCKER_COMPOSE_FILE pull",
         "docker compose -f $DOCKER_COMPOSE_FILE up -d --remove-orphans",
-        "DOCKER_EXIT_CODE=$?; echo \"DOCKER_DEPLOYMENT_STATUS:$DOCKER_EXIT_CODE\""
+        "DOCKER_EXIT_CODE=$?; echo DOCKER_DEPLOYMENT_STATUS:$DOCKER_EXIT_CODE"
     )
     
     $fullCommand = $sshCommand -join "; "
