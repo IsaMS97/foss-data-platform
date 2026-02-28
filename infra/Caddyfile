@@ -1,13 +1,14 @@
-# Global configuration
-auto_https disable website.platform.smith-data.de
-
-# Dockhand service (keep TLS as it works)
+# Dockhand service
 dockhand.platform.smith-data.de {
     reverse_proxy dockhand:3000
     tls internal
 }
 
-# Simple website - HTTP only
+# Simple website - try sharing the same internal CA as dockhand
 website.platform.smith-data.de {
-    reverse_proxy http://simple-website:80
+    reverse_proxy simple-website:80
+    tls internal {
+        # Try to use the same internal CA as dockhand
+        # This should share certificate storage
+    }
 }
