@@ -134,18 +134,10 @@ try {
     $DOCKER_COMPOSE_FILE = $config.dockerComposeFile
     $SSH_KEY_PATH = $config.sshKeyPath
     
-    # Convert Windows path to Unix-style for SSH if needed
+    # Convert Windows path to forward slashes for SSH compatibility
+    # SSH on Windows can handle paths like C:/Users/name/.ssh/id_rsa
     if ($SSH_KEY_PATH -match '\\') {
-        # Simple conversion for common case: C:\path\to\file -> /mnt/c/path/to/file
         $SSH_KEY_PATH = $SSH_KEY_PATH -replace '\\', '/'
-        if ($SSH_KEY_PATH -like 'C:*') {
-            $SSH_KEY_PATH = $SSH_KEY_PATH -replace 'C:', '/c'
-            $SSH_KEY_PATH = '/mnt' + $SSH_KEY_PATH
-        } elseif ($SSH_KEY_PATH -like 'D:*') {
-            $SSH_KEY_PATH = $SSH_KEY_PATH -replace 'D:', '/d'
-            $SSH_KEY_PATH = '/mnt' + $SSH_KEY_PATH
-        }
-        # Add more drive letters as needed
     }
     
     Write-Log "Loaded configuration from $ConfigFile"
