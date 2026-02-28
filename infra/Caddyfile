@@ -4,13 +4,7 @@ dockhand.platform.smith-data.de {
     tls internal
 }
 
-# Simple website - HTTP only, explicitly disable HTTPS
-website.platform.smith-data.de {
+# Simple website - HTTP only by binding to port 80 explicitly
+website.platform.smith-data.de:80 {
     reverse_proxy http://simple-website:80
-    @https {
-        protocol https
-    }
-    handle @https {
-        respond "Please use HTTP for this service" 400
-    }
 }
