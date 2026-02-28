@@ -12,56 +12,7 @@ This script automates the deployment process by:
 Usage: .\deploy.ps1 -RemoteUser username -RemoteHost hostname -RemotePath "/path/to/repo"
 #>
 
-param (
-    [Parameter(Mandatory=$false)]
-    [string]$RemoteUser,
-    
-    [Parameter(Mandatory=$false)]
-    [string]$RemoteHost,
-    
-    [Parameter(Mandatory=$false)]
-    [string]$RemotePath,
-    
-    [Parameter(Mandatory=$false)]
-    [string]$ConfigFile = "config.json"
-)
-
-# Configuration
-$SSH_PORT = 22
-$DOCKER_COMPOSE_FILE = "docker-compose.yml"
-
-# Load configuration from file if parameters not provided
-if (-not $RemoteUser -or -not $RemoteHost -or -not $RemotePath) {
-    if (Test-Path $ConfigFile) {
-        try {
-            $config = Get-Content $ConfigFile | ConvertFrom-Json
-            
-            if (-not $RemoteUser) { $RemoteUser = $config.remoteUser }
-            if (-not $RemoteHost) { $RemoteHost = $config.remoteHost }
-            if (-not $RemotePath) { $RemotePath = $config.remotePath }
-            if ($config.sshPort) { $SSH_PORT = $config.sshPort }
-            if ($config.dockerComposeFile) { $DOCKER_COMPOSE_FILE = $config.dockerComposeFile }
-            
-            Write-ColorText "Loaded configuration from $ConfigFile" "Blue"
-        } catch {
-            Write-ColorText "ERROR: Failed to load configuration file: $_" "Red"
-            exit 1
-        }
-    } else {
-        Write-ColorText "ERROR: Configuration file $ConfigFile not found and required parameters not provided" "Red"
-        Write-ColorText "Usage: .\deploy.ps1 -RemoteUser username -RemoteHost hostname -RemotePath /path/to/repo" "Yellow"
-        Write-ColorText "Or create a $ConfigFile configuration file" "Yellow"
-        exit 1
-    }
-}
-
-# Validate required parameters
-if (-not $RemoteUser -or -not $RemoteHost -or -not $RemotePath) {
-    Write-ColorText "ERROR: Missing required parameters" "Red"
-    Write-ColorText "Usage: .\deploy.ps1 -RemoteUser username -RemoteHost hostname -RemotePath /path/to/repo" "Yellow"
-    exit 1
-}
-
+# Function definitions
 function Write-ColorText {
     param (
         [string]$Text,
@@ -163,6 +114,37 @@ function Deploy-Remote {
         Write-ColorText "ERROR: Remote deployment failed: $_" "Red"
         return $false
     }
+}
+
+# Load configuration from config.json
+$ConfigFile = "config.json"
+
+if (-not (Test-Path $ConfigFile)) {
+    Write-ColorText "ERROR: Configuration file $ConfigFile not found" "Red"
+    Write-ColorText "Please copy config.example.json to config.json and edit it with your settings" "Yellow"
+    exit 1
+}
+
+try {
+    $config = Get-Content $ConfigFile | ConvertFrom-Json
+    
+    $RemoteUser = $config.remoteUser
+    $RemoteHost = $config.remoteHost
+    $RemotePath = $config.remotePath
+    $SSH_PORT = $config.sshPort
+    $DOCKER_COMPOSE_FILE = $config.dockerComposeFile
+    
+    Write-ColorText "Loaded configuration from $ConfigFile" "Blue"
+} catch {
+    Write-ColorText "ERROR: Failed to load configuration file: $_" "Red"
+    exit 1
+}
+
+# Validate configuration
+if (-not $RemoteUser -or -not $RemoteHost -or -not $RemotePath) {
+    Write-ColorText "ERROR: Missing required configuration values" "Red"
+    Write-ColorText "Please check your $ConfigFile file" "Yellow"
+    exit 1
 }
 
 # Main execution
