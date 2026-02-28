@@ -1,8 +1,8 @@
 {
     "remoteUser": "your_username",
     "remoteHost": "your-server.internal",
-    "remotePath": "/path/to/foss-data-platform",
+    "remotePath": "/path/to/foss-data-platform/infra",
     "sshPort": 22,
-    "dockerComposeFile": "infra/docker-compose.yml",
+    "dockerComposeFile": "docker-compose.yml",
     "sshKeyPath": "C:/Users/YourUsername/.ssh/id_rsa"
 }

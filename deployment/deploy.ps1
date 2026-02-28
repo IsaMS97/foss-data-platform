@@ -106,7 +106,7 @@ function Deploy-Remote {
         "git reset --hard origin/$branch",
         "docker compose -f $DOCKER_COMPOSE_FILE pull",
         "docker compose -f $DOCKER_COMPOSE_FILE up -d --remove-orphans",
-        "echo 'DOCKER_DEPLOYMENT_STATUS:$?'"
+        "DOCKER_EXIT_CODE=$?; echo \"DOCKER_DEPLOYMENT_STATUS:$DOCKER_EXIT_CODE\""
     )
     
     $fullCommand = $sshCommand -join "; "
@@ -124,8 +124,14 @@ function Deploy-Remote {
         if ($result -match "DOCKER_DEPLOYMENT_STATUS:0") {
             Write-Log "Docker deployment verified successful"
             return $true
+        } elseif ($result -match "DOCKER_DEPLOYMENT_STATUS:(\d+)") {
+            $exitCode = $matches[1]
+            Write-Log "ERROR: Docker deployment failed with exit code $exitCode"
+            Write-Log "Full output: $result"
+            return $false
         } else {
-            Write-Log "ERROR: Docker deployment failed - non-zero exit code"
+            Write-Log "ERROR: Could not determine Docker deployment status"
+            Write-Log "Full output: $result"
             return $false
         }
     } catch {
