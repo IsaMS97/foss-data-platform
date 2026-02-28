@@ -93,15 +93,22 @@ function Deploy-Remote {
     $fullCommand = $sshCommand -join "; "
     
     try {
-        Write-ColorText "Executing remote deployment..." "Blue"
+        Write-Log "Executing remote deployment..."
         $sshTarget = $user + '@' + $hostname
         $sshCommand = "ssh -i `$sshKeyPath` -o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=no $sshTarget '$fullCommand'"
         $result = iex "$sshCommand"
         
-        Write-ColorText "Remote deployment completed:" "Green"
-        Write-ColorText "$result" "White"
+        Write-Log "Remote deployment completed:"
+        Write-Log "$result"
         
-        return $true
+        # Check if Docker deployment was successful
+        if ($result -match "DOCKER_DEPLOYMENT_STATUS:0") {
+            Write-Log "Docker deployment verified successful"
+            return $true
+        } else {
+            Write-Log "ERROR: Docker deployment failed - non-zero exit code"
+            return $false
+        }
     } catch {
         Write-Log "ERROR: Remote deployment failed: $_"
         return $false
