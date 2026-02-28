@@ -99,41 +99,39 @@ function Deploy-Remote {
         [string]$sshKeyPath
     )
     
-    $sshCommand = @(
-        "cd $path",
-        "git fetch origin",
-        "git checkout $branch",
-        "git reset --hard origin/$branch",
-        "docker compose -f $DOCKER_COMPOSE_FILE pull",
-        "docker compose -f $DOCKER_COMPOSE_FILE up -d --remove-orphans",
-        "DOCKER_EXIT_CODE=$?; echo DOCKER_DEPLOYMENT_STATUS:$DOCKER_EXIT_CODE"
-    )
-    
-    $fullCommand = $sshCommand -join "; "
-    
     try {
         Write-Log "Executing remote deployment..."
         $sshTarget = $user + '@' + $hostname
-        $sshCommand = "ssh -i `$sshKeyPath` -o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=no $sshTarget '$fullCommand'"
-        $result = iex "$sshCommand"
         
-        Write-Log "Remote deployment completed:"
-        Write-Log "$result"
+        # Step 1: Git operations
+        $gitCommand = "cd $path && git fetch origin && git checkout $branch && git reset --hard origin/$branch"
+        Write-Log "Running git sync: $gitCommand"
+        $gitResult = iex "ssh -i `$sshKeyPath` -o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=no $sshTarget '$gitCommand'"
+        $gitExitCode = $LASTEXITCODE
+        Write-Log "Git operations completed with exit code: $gitExitCode"
+        Write-Log "Git output: $gitResult"
         
-        # Check if Docker deployment was successful
-        if ($result -match "DOCKER_DEPLOYMENT_STATUS:0") {
-            Write-Log "Docker deployment verified successful"
-            return $true
-        } elseif ($result -match "DOCKER_DEPLOYMENT_STATUS:(\d+)") {
-            $exitCode = $matches[1]
-            Write-Log "ERROR: Docker deployment failed with exit code $exitCode"
-            Write-Log "Full output: $result"
-            return $false
-        } else {
-            Write-Log "ERROR: Could not determine Docker deployment status"
-            Write-Log "Full output: $result"
+        if ($gitExitCode -ne 0) {
+            Write-Log "ERROR: Git operations failed"
             return $false
         }
+        
+        # Step 2: Docker operations
+        $dockerCommand = "cd $path && docker compose -f $DOCKER_COMPOSE_FILE pull && docker compose -f $DOCKER_COMPOSE_FILE up -d --remove-orphans"
+        Write-Log "Running docker deployment: $dockerCommand"
+        $dockerResult = iex "ssh -i `$sshKeyPath` -o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=no $sshTarget '$dockerCommand'"
+        $dockerExitCode = $LASTEXITCODE
+        Write-Log "Docker operations completed with exit code: $dockerExitCode"
+        Write-Log "Docker output: $dockerResult"
+        
+        if ($dockerExitCode -eq 0) {
+            Write-Log "Docker deployment verified successful"
+            return $true
+        } else {
+            Write-Log "ERROR: Docker deployment failed with exit code $dockerExitCode"
+            return $false
+        }
+        
     } catch {
         Write-Log "ERROR: Remote deployment failed: $_"
         return $false
