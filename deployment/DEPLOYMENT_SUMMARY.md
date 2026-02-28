@@ -58,22 +58,18 @@ I've created a comprehensive PowerShell deployment script for your FOSS Data Pla
 - Troubleshooting guide
 - Security notes
 
-## Usage Examples
+## Usage
 
 ```powershell
-# Using configuration file (recommended)
-.\deploy.ps1
-
-# Using command line parameters
-.\deploy.ps1 -RemoteUser deploy -RemoteHost my-server.internal -RemotePath "/opt/foss-data-platform"
-
-# Using custom config file
-.\deploy.ps1 -ConfigFile "production.config.json"
+# Simple usage
+.\deployment\deploy.ps1
 ```
+
+The script exclusively uses the `config.json` file for configuration.
 
 ## Configuration
 
-Edit `deploy.config.json`:
+Edit `deployment/config.json`:
 ```json
 {
     "remoteUser": "your_username",
@@ -108,5 +104,7 @@ The script has been tested and verified to:
 3. Set up SSH key authentication to your remote server
 4. Ensure you're connected to VPN before running
 5. Run `.\[deployment\deploy.ps1](deployment/deploy.ps1)` to deploy!
+
+The script now exclusively uses `config.json` - no command line parameters needed.
 
 The script is production-ready and handles all the requirements you specified in an elegant, automated way.

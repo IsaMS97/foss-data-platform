@@ -17,18 +17,11 @@ No installation needed. Just ensure you have the prerequisites above.
 ## Usage
 
 ```powershell
-# Using configuration file (recommended)
+# Simple usage - just run the script
 .\deployment\deploy.ps1
-
-# Using command line parameters
-.\deployment\deploy.ps1 -RemoteUser username -RemoteHost hostname -RemotePath "/path/to/repo"
-
-# Using custom config file
-.\deployment\deploy.ps1 -ConfigFile "custom.config.json"
-
-# Example with parameters
-.\deployment\deploy.ps1 -RemoteUser deploy -RemoteHost my-server.internal -RemotePath "/opt/foss-data-platform"
 ```
+
+The script exclusively uses the `config.json` file for configuration.
 
 ## Configuration File
 

@@ -40,12 +40,11 @@ ssh your_username@your-server.internal
 ### 4. Deploy!
 
 ```powershell
-# Using config file (recommended)
+# Simple usage
 .\deployment\deploy.ps1
-
-# Or with parameters
-.\deployment\deploy.ps1 -RemoteUser username -RemoteHost server -RemotePath "/path"
 ```
+
+The script exclusively uses `config.json` for configuration.
 
 ## 🔧 Configuration Example
 
