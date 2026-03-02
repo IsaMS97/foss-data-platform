@@ -5,6 +5,6 @@ dockhand.platform.smith-data.de {
 }
 
 filer.platform.smith-data.de {
-    reverse_proxy filer:8888
+    reverse_proxy filer:18888
     tls internal
 }
