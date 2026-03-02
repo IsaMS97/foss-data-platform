@@ -3,3 +3,8 @@ dockhand.platform.smith-data.de {
     reverse_proxy dockhand:3000
     tls internal
 }
+
+filer.platform.smith-data.de {
+    reverse_proxy filer:8888
+    tls internal
+}

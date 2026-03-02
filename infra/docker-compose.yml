@@ -1,4 +1,5 @@
 services:
+  # Reverse Proxy
   caddy:
     image: caddy:latest
     container_name: caddy
@@ -13,6 +14,7 @@ services:
     networks:
       - proxy
 
+  # Docker monitoring
   dockhand:
     image: fnsys/dockhand:latest
     container_name: dockhand
@@ -27,6 +29,48 @@ services:
       - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
     networks:
       - proxy
+
+
+  # SeaweedFS
+  master:
+    image: chrislusf/seaweedfs # use a remote image
+    ports:
+      - 9333:9333
+      - 19333:19333
+      - 9324:9324
+    command: 'master -ip=master -ip.bind=0.0.0.0 -metricsPort=9324'
+  volume:
+    image: chrislusf/seaweedfs # use a remote image
+    ports:
+      - 8080:8080
+      - 18080:18080
+      - 9325:9325
+    command: 'volume -ip=volume -master="master:9333" -ip.bind=0.0.0.0 -port=8080 -metricsPort=9325'
+    depends_on:
+      - master
+  filer:
+    image: chrislusf/seaweedfs # use a remote image
+    ports:
+      - 8888:8888
+      - 18888:18888
+      - 9326:9326
+    command: 'filer -ip=filer -master="master:9333" -ip.bind=0.0.0.0 -metricsPort=9326'
+    tty: true
+    stdin_open: true
+    depends_on:
+      - master
+      - volume
+  s3:
+    image: chrislusf/seaweedfs # use a remote image
+    ports:
+      - 8333:8333
+      - 9327:9327
+    command: 's3 -filer="filer:8888" -ip.bind=0.0.0.0 -metricsPort=9327'
+    depends_on:
+      - master
+      - volume
+      - filer
+
 
 volumes:
   dockhand_data:
