@@ -1,10 +1,10 @@
 # Dockhand service
 dockhand.platform.smith-data.de {
     reverse_proxy dockhand:3000
-    tls internal
+    tls /etc/caddy/certificates/wildcard.crt /etc/caddy/certificates/wildcard.key
 }
 
 filer.platform.smith-data.de {
     reverse_proxy filer:18888
-    tls internal
+    tls /etc/caddy/certificates/wildcard.crt /etc/caddy/certificates/wildcard.key
 }
