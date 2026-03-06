@@ -23,6 +23,27 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 
 ### RustFS
 
+This sets the permissions for ownership to match the container user (UID 10001)
+
+```
+sudo chown -R 10001:10001 rustfs_data rustfs_logs
+```
+
+Creates the enviroment file
+
+```
+nano .env
+```
+
+Afterwards, this adds your configuration.
+
+```
+# RustFS Access Key (username)
+RUSTFS_ACCESS_KEY=rustfsadmin
+
+# RustFS Secret Key (password - CHANGE THIS!)
+RUSTFS_SECRET_KEY=your-super-secure-secret-key-minimum-8-chars 
+```
 
 
 ## Client side
