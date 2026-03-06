@@ -5,11 +5,11 @@ dockhand.platform.smith-data.de {
 }
 
 s3.platform.smith-data.de {
-    reverse_proxy localhost:9000
+    reverse_proxy rustfs:9000
     tls /etc/caddy/certificates/wildcard.crt /etc/caddy/certificates/wildcard.key
 }
 
 storage.platform.smith-data.de {
-    reverse_proxy localhost:9001
+    reverse_proxy rustfs:9001
     tls /etc/caddy/certificates/wildcard.crt /etc/caddy/certificates/wildcard.key
 }
