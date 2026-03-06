@@ -39,8 +39,8 @@ services:
     networks:
       - proxy
     volumes:
-      - ./data:/data
-      - ./logs:/app/logs
+      - ./rustfs_data:/data
+      - ./rustfs_logs:/app/logs
     environment:
       - RUSTFS_VOLUMES=/data
       - RUSTFS_ADDRESS=0.0.0.0:9000
