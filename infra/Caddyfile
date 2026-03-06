@@ -10,6 +10,6 @@ s3.platform.smith-data.de {
 }
 
 storage.platform.smith-data.de {
-    reverse_proxy rustfs:9001
+    reverse_proxy rustfs:9002
     tls /etc/caddy/certificates/wildcard.crt /etc/caddy/certificates/wildcard.key
 }
