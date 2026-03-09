@@ -31,7 +31,7 @@ To make it a complete Data Platform, wee need additional services:
 
 ### RustFS
 
-[RustFS](services/rustfs.md) provides high security and high concurrency performance improvements from Rust
+[RustFS](services/rustfs.md) provides advanced blob storage capabilities with S3 API at cutting edge performance
 
 ### Lakekeeper
 

@@ -23,19 +23,20 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 
 ### RustFS
 
-This sets the permissions for ownership to match the container user (UID 10001)
+Set permissions for ownership to match the container user (UID 10001)  
+You can find these two folders under /infra  
 
 ```
 sudo chown -R 10001:10001 rustfs_data rustfs_logs
 ```
 
-Creates the enviroment file
+Create and edit the enviroment file
 
 ```
 nano .env
 ```
 
-Afterwards, this adds your configuration.
+Add this to your configuration to specify your username and password. Please change the password from default to a personal choice.
 
 ```
 # RustFS Access Key (username)
