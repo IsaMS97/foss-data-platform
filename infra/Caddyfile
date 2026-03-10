@@ -1,5 +1,15 @@
 # Dockhand service
 dockhand.platform.smith-data.de {
     reverse_proxy dockhand:3000
-    tls internal
+    tls /etc/caddy/certificates/wildcard.crt /etc/caddy/certificates/wildcard.key
+}
+
+s3.platform.smith-data.de {
+    reverse_proxy rustfs:9000
+    tls /etc/caddy/certificates/wildcard.crt /etc/caddy/certificates/wildcard.key
+}
+
+storage.platform.smith-data.de {
+    reverse_proxy rustfs:9001
+    tls /etc/caddy/certificates/wildcard.crt /etc/caddy/certificates/wildcard.key
 }

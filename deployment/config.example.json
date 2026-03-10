@@ -1,0 +1,8 @@
+{
+    "remoteUser": "root",
+    "remoteHost": "platform.smith-data.de",
+    "remotePath": "~/foss-data-platform/infra",
+    "sshPort": 22,
+    "dockerComposeFile": "docker-compose.yml",
+    "sshKeyPath": "C:/Users/YourUsername/KEY"
+}

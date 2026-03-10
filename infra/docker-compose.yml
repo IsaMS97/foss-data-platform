@@ -1,4 +1,5 @@
 services:
+  # Reverse Proxy
   caddy:
     image: caddy:latest
     container_name: caddy
@@ -10,9 +11,11 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
+      - ./certificates:/etc/caddy/certificates:ro
     networks:
       - proxy
 
+  # Docker monitoring
   dockhand:
     image: fnsys/dockhand:latest
     container_name: dockhand
@@ -27,6 +30,41 @@ services:
       - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
     networks:
       - proxy
+
+
+  # RustFS
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: rustfs
+    networks:
+      - proxy
+    volumes:
+      - ./rustfs_data:/data
+      - ./rustfs_logs:/app/logs
+    environment:
+      - RUSTFS_VOLUMES=/data
+      - RUSTFS_ADDRESS=0.0.0.0:9000
+      - RUSTFS_CONSOLE_ADDRESS=0.0.0.0:9001
+      - RUSTFS_CONSOLE_ENABLE=true
+      - RUSTFS_ACCESS_KEY=${RUSTFS_ACCESS_KEY:-rustfsadmin}
+      - RUSTFS_SECRET_KEY=${RUSTFS_SECRET_KEY}
+      - RUSTFS_CORS_ALLOWED_ORIGINS=*
+      - RUSTFS_CONSOLE_CORS_ALLOWED_ORIGINS=*
+    expose:
+      - "9000"
+      - "9001"
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -f http://localhost:9000/health && curl -f http://localhost:9001/rustfs/console/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 4GB
 
 volumes:
   dockhand_data:

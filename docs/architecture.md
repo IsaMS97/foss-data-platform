@@ -29,9 +29,9 @@ To make it a complete Data Platform, wee need additional services:
 
 ## Core Platform services
 
-### SeaweedFS
+### RustFS
 
-[Seaweed FS](services/seaweedFS.md) provides advanced blob storage capabilities with S3 API at cutting edge performance
+[RustFS](services/rustfs.md) provides advanced blob storage capabilities with S3 API at cutting edge performance
 
 ### Lakekeeper
 
