@@ -69,8 +69,8 @@ services:
 # Lakekeeper
 
   lakekeeper:
-    # extra_hosts:
-    #   - "s3.platform.smith-data.de:host-gateway"
+    extra_hosts:
+      - "s3.platform.smith-data.de:host-gateway"
     image: &lakekeeper-image ${LAKEKEEPER__SERVER_IMAGE:-quay.io/lakekeeper/catalog:latest-main}
     pull_policy: &lakekeeper-pull-policy always
     environment: &lakekeeper-environment
