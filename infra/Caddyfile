@@ -13,3 +13,8 @@ storage.platform.smith-data.de {
     reverse_proxy rustfs:9001
     tls /etc/caddy/certificates/wildcard.crt /etc/caddy/certificates/wildcard.key
 }
+
+catalog.platform.smith-data.de {
+    reverse_proxy lakekeeper:8181
+    tls /etc/caddy/certificates/wildcard.crt /etc/caddy/certificates/wildcard.key
+}
