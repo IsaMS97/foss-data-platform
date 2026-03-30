@@ -83,6 +83,7 @@ services:
       - LAKEKEEPER__UI__OPENID_CLIENT_ID
       - LAKEKEEPER__UI__OPENID_SCOPE
     command: [ "serve" ]
+    dns: 127.0.0.11
     healthcheck:
       test: [ "CMD", "/home/nonroot/lakekeeper", "healthcheck" ]
       interval: 1s
