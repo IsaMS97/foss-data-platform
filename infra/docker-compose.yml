@@ -93,6 +93,8 @@ services:
     depends_on:
       migrate:
         condition: service_completed_successfully
+    volumes:
+      - ./certificates/combined-ca.crt:/etc/ssl/certs/ca-certificates.crt:ro
     expose:
       - "8181"
     networks:
