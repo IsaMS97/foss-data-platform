@@ -28,9 +28,9 @@ services:
       - ./certificates/combined-ca.crt:/etc/ssl/certs/ca-certificates.crt:ro
     environment:
       - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+      - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
     networks:
       - proxy
-
 
   # RustFS
   rustfs:
@@ -55,7 +55,7 @@ services:
       - "9000"
       - "9001"
     healthcheck:
-      test: ["CMD", "sh", "-c", "curl -f http://localhost:9000/health && curl -f http://localhost:9001/rustfs/console/health"]
+      test: [ "CMD", "sh", "-c", "curl -f http://localhost:9000/health && curl -f http://localhost:9001/rustfs/console/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -67,7 +67,7 @@ services:
           cpus: "2.0"
           memory: 4GB
 
-# Lakekeeper
+  # Lakekeeper
 
   lakekeeper:
     image: &lakekeeper-image ${LAKEKEEPER__SERVER_IMAGE:-quay.io/lakekeeper/catalog:latest-main}
@@ -98,7 +98,7 @@ services:
       - "8181"
     networks:
       proxy:
-    
+
 
   migrate:
     image: *lakekeeper-image
@@ -111,6 +111,7 @@ services:
         condition: service_healthy
     networks:
       proxy:
+
 
   db:
     image: postgres:17
@@ -139,4 +140,3 @@ volumes:
 networks:
   proxy:
     external: true
-
