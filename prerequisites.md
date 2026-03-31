@@ -26,26 +26,25 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 Set permissions for ownership to match the container user (UID 10001)  
 You can find these two folders under /infra  
 
-```
+```bash
 sudo chown -R 10001:10001 rustfs_data rustfs_logs
 ```
 
 Create and edit the enviroment file
 
-```
+```bash
 nano .env
 ```
 
 Add this to your configuration to specify your username and password. Please change the password from default to a personal choice.
 
-```
+```bash
 # RustFS Access Key (username)
 RUSTFS_ACCESS_KEY=rustfsadmin
 
 # RustFS Secret Key (password - CHANGE THIS!)
 RUSTFS_SECRET_KEY=your-super-secure-secret-key-minimum-8-chars 
 ```
-
 
 ## Client side
 
