@@ -37,7 +37,8 @@ services:
     image: rustfs/rustfs:latest
     container_name: rustfs
     networks:
-      - proxy
+      - proxy:
+        ipv4_address: 172.18.0.4
     volumes:
       - ./rustfs_data:/data
       - ./rustfs_logs:/app/logs
@@ -69,8 +70,6 @@ services:
 # Lakekeeper
 
   lakekeeper:
-    extra_hosts:
-      - "s3.platform.smith-data.de:host-gateway"
     image: &lakekeeper-image ${LAKEKEEPER__SERVER_IMAGE:-quay.io/lakekeeper/catalog:latest-main}
     pull_policy: &lakekeeper-pull-policy always
     environment: &lakekeeper-environment
