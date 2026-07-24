@@ -5,6 +5,12 @@
 *.cer
 *.der
 *.priv
+*.csr
+*.srl
+
+### local environment ###
+.env
+infra/.env
 
 ### deployment ###
 /deployment/config.json

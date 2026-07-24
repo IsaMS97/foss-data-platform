@@ -1,9 +1,24 @@
 services:
+  # Bootstrap local certs when the repo cert directory is empty
+  certgen:
+    image: alpine:3.20
+    container_name: certgen
+    restart: "no"
+    volumes:
+      - ./certificates:/certs
+      - ./certificates/bootstrap.sh:/bootstrap.sh:ro
+    entrypoint: ["/bin/sh", "/bootstrap.sh"]
+    networks:
+      - proxy
+
   # Reverse Proxy
   caddy:
     image: caddy:latest
     container_name: caddy
     restart: unless-stopped
+    depends_on:
+      certgen:
+        condition: service_completed_successfully
     ports:
       - "80:80"
       - "443:443"
@@ -20,6 +35,9 @@ services:
     image: fnsys/dockhand:latest
     container_name: dockhand
     restart: unless-stopped
+    depends_on:
+      certgen:
+        condition: service_completed_successfully
     expose:
       - "3000" # internal only
     volumes:
@@ -72,6 +90,11 @@ services:
   lakekeeper:
     image: &lakekeeper-image ${LAKEKEEPER__SERVER_IMAGE:-quay.io/lakekeeper/catalog:latest-main}
     pull_policy: &lakekeeper-pull-policy always
+    depends_on:
+      certgen:
+        condition: service_completed_successfully
+      migrate:
+        condition: service_completed_successfully
     environment: &lakekeeper-environment
       - LAKEKEEPER__PG_DATABASE_URL_READ=postgresql://postgres:postgres@db:5432/postgres
       - LAKEKEEPER__PG_DATABASE_URL_WRITE=postgresql://postgres:postgres@db:5432/postgres
@@ -90,9 +113,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 3s
-    depends_on:
-      migrate:
-        condition: service_completed_successfully
     volumes:
       - ./certificates/combined-ca.crt:/etc/ssl/certs/ca-certificates.crt:ro
     expose:
@@ -140,4 +160,7 @@ volumes:
 
 networks:
   proxy:
-    external: true
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/24
