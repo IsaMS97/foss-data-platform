@@ -120,18 +120,19 @@ services:
       rustfs-init:
         condition: service_completed_successfully
       keycloak:
-        condition: service_started
+        condition: service_healthy
+    extra_hosts:
+      - "keycloak.localhost:host-gateway"
     environment: &lakekeeper-environment
       - LAKEKEEPER__PG_DATABASE_URL_READ=postgresql://postgres:postgres@db:5432/postgres
       - LAKEKEEPER__PG_DATABASE_URL_WRITE=postgresql://postgres:postgres@db:5432/postgres
-      - LAKEKEEPER__AUTHZ_BACKEND=allowall
-      # Externally taken from environment variables if set
-      - LAKEKEEPER__PG_ENCRYPTION_KEY
-      - LAKEKEEPER__OPENID_PROVIDER_URI
-      - LAKEKEEPER__OPENID_AUDIENCE
-      - LAKEKEEPER__OPENID_ADDITIONAL_ISSUERS
-      - LAKEKEEPER__UI__OPENID_CLIENT_ID
-      - LAKEKEEPER__UI__OPENID_SCOPE
+      - LAKEKEEPER__OPENID_PROVIDER_URI=https://keycloak.localhost/realms/foss-platform
+      - LAKEKEEPER__PG_ENCRYPTION_KEY=${LAKEKEEPER__PG_ENCRYPTION_KEY:-This-is-NOT-Secure!}
+      - LAKEKEEPER__OPENID_AUDIENCE=lakekeeper
+      - LAKEKEEPER__OPENID_ADDITIONAL_ISSUERS=https://keycloak.localhost/realms/foss-platform
+      - LAKEKEEPER__UI__OPENID_CLIENT_ID=lakekeeper
+      - LAKEKEEPER__UI__OPENID_PROVIDER_URI=https://keycloak.localhost/realms/foss-platform
+      - 'LAKEKEEPER__UI__OPENID_SCOPE=openid profile'
     command: [ "serve" ]
     healthcheck:
       test: [ "CMD", "/home/nonroot/lakekeeper", "healthcheck" ]
@@ -155,6 +156,8 @@ services:
     command: [ "migrate" ]
     depends_on:
       db:
+        condition: service_healthy
+      keycloak:
         condition: service_healthy
     networks:
       proxy:
@@ -221,6 +224,16 @@ services:
       - ./keycloak:/opt/keycloak/data/import:ro
     expose:
       - "8080"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "exec 3<>/dev/tcp/127.0.0.1/8080;echo -e \"GET /realms/master/.well-known/openid-configuration HTTP/1.1\\r\\nhost: 127.0.0.1:8080\\r\\nConnection: close\\r\\n\\r\\n\" >&3;grep \"jwks_uri\" <&3",
+        ]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 30s
     networks:
       proxy:
 

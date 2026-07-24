@@ -5,7 +5,24 @@ COMPOSE_FILE=infra/docker-compose.yml
 
 # Removes all Keycloak state so Keycloak imports realm-import.json on next start.
 docker compose -f "$COMPOSE_FILE" down
-docker volume rm infra_volume-keycloak
+
+# Compose prefixes volume names with the project name. Remove all matching
+# keycloak DB volumes so realm-import is applied on next startup.
+for vol in $(docker volume ls --format '{{.Name}}' | grep -E '(_volume-keycloak$|keycloak-db|keycloak_postgres|volume-keycloak$)' || true); do
+	echo "Removing volume: $vol"
+	docker volume rm "$vol" >/dev/null 2>&1 || true
+done
+
+# Fallback for setups where the volume is not project-prefixed.
+docker volume rm volume-keycloak >/dev/null 2>&1 || true
+
+# Remove stale standalone containers if they exist.
+docker rm -f keycloak keycloak-db >/dev/null 2>&1 || true
+
 docker compose -f "$COMPOSE_FILE" up -d --force-recreate keycloak-db keycloak
+
+echo "Waiting for Keycloak to become healthy..."
+docker compose -f "$COMPOSE_FILE" up -d --wait keycloak
+
 docker compose -f "$COMPOSE_FILE" down
 docker compose -f "$COMPOSE_FILE" up -d
