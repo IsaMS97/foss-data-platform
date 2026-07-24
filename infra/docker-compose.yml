@@ -213,7 +213,6 @@ services:
       - KC_HOSTNAME_STRICT=false
       - KC_TRUSTED_HOSTS=keycloak.localhost,localhost
       - KC_HTTP_ENABLED=true
-      - KC_PROXY=edge
       - KC_PROXY_HEADERS=xforwarded
       - KC_HEALTH_ENABLED=true
       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN:-admin}

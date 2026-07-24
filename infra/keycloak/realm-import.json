@@ -17,6 +17,9 @@
       "lastName": "Developer",
       "email": "demo-developer@example.com",
       "emailVerified": true,
+      "realmRoles": [
+        "default-roles-foss-platform"
+      ],
       "groups": [
         "lakekeeper-developers",
         "dockhand-users"
