@@ -38,6 +38,10 @@ services:
     depends_on:
       certgen:
         condition: service_completed_successfully
+      keycloak:
+        condition: service_started
+    extra_hosts:
+      - "keycloak.localhost:host-gateway"
     expose:
       - "3000" # internal only
     volumes:
@@ -56,10 +60,9 @@ services:
     container_name: rustfs
     networks:
       proxy:
-        ipv4_address: 172.18.0.4
     volumes:
-      - ./rustfs_data:/data
-      - ./rustfs_logs:/app/logs
+      - rustfs_data:/data
+      - rustfs_logs:/app/logs
     environment:
       - RUSTFS_VOLUMES=/data
       - RUSTFS_ADDRESS=0.0.0.0:9000
@@ -150,12 +153,64 @@ services:
     networks:
       proxy:
 
+  keycloak-db:
+    image: postgres:17
+    container_name: keycloak-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=keycloak
+      - POSTGRES_PASSWORD=${KEYCLOAK_DB_PASSWORD:-keycloak}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U keycloak -p 5432 -d keycloak" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - volume-keycloak:/var/lib/postgresql/data
+    networks:
+      proxy:
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: keycloak
+    restart: unless-stopped
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    command: [ "start-dev", "--import-realm" ]
+    environment:
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://keycloak-db:5432/keycloak
+      - KC_DB_USERNAME=keycloak
+      - KC_DB_PASSWORD=${KEYCLOAK_DB_PASSWORD:-keycloak}
+      - KC_HOSTNAME=keycloak.localhost
+      - KC_HOSTNAME_STRICT=false
+      - KC_TRUSTED_HOSTS=keycloak.localhost,localhost
+      - KC_HTTP_ENABLED=true
+      - KC_PROXY=edge
+      - KC_PROXY_HEADERS=xforwarded
+      - KC_HEALTH_ENABLED=true
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN:-admin}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import:ro
+    expose:
+      - "8080"
+    networks:
+      proxy:
+
 
 volumes:
+  rustfs_data:
+  rustfs_logs:
   dockhand_data:
   caddy_data:
   caddy_config:
   volume-lakekeeper:
+  volume-keycloak:
 
 
 networks:

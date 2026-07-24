@@ -1,0 +1,74 @@
+{
+  "realm": "foss-platform",
+  "enabled": true,
+  "groups": [
+    {
+      "name": "lakekeeper-developers"
+    },
+    {
+      "name": "dockhand-users"
+    }
+  ],
+  "users": [
+    {
+      "username": "demo-developer",
+      "enabled": true,
+      "firstName": "Demo",
+      "lastName": "Developer",
+      "email": "demo-developer@example.com",
+      "emailVerified": true,
+      "groups": [
+        "lakekeeper-developers",
+        "dockhand-users"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "demo-developer",
+          "temporary": false
+        }
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "dockhand-app",
+      "name": "Dockhand",
+      "description": "OIDC client for Dockhand at https://dockhand.localhost",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${DOCKHAND_OIDC_CLIENT_SECRET:-dockhand-local-dev-secret}",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "implicitFlowEnabled": false,
+      "redirectUris": [
+        "https://dockhand.localhost/api/auth/oidc/callback"
+      ],
+      "webOrigins": [
+        "https://dockhand.localhost"
+      ],
+      "attributes": {
+        "post.logout.redirect.uris": "https://dockhand.localhost/*"
+      },
+      "protocolMappers": [
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "claim.name": "groups",
+            "full.path": "false",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ]
+}

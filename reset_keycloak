@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+
+COMPOSE_FILE=infra/docker-compose.yml
+
+# Removes all Keycloak state so Keycloak imports realm-import.json on next start.
+docker compose -f "$COMPOSE_FILE" down
+docker volume rm infra_volume-keycloak
+docker compose -f "$COMPOSE_FILE" up -d --force-recreate keycloak-db keycloak
+docker compose -f "$COMPOSE_FILE" down
+docker compose -f "$COMPOSE_FILE" up -d

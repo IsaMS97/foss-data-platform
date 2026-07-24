@@ -14,3 +14,9 @@ infra/.env
 
 ### deployment ###
 /deployment/config.json
+
+### RustFS runtime data ###
+/infra/rustfs_data/*
+!/infra/rustfs_data/.gitkeep
+/infra/rustfs_logs/*
+!/infra/rustfs_logs/.gitkeep

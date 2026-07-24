@@ -70,3 +70,7 @@ TBD
 ### Dockhand
 
 [Dockhand](services/dockhand.md) provides easily accessilbe monitoring of all docker services, ensuring health, providing insight in resource usage and searching for vulnerabilities
+
+### Keycloak
+
+[Keycloak](services/keycloak.md) provides identity and access management for the platform, including SSO and OpenID Connect integration for services such as Lakekeeper and future applications.

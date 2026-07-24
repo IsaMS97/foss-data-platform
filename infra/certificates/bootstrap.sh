@@ -29,7 +29,7 @@ if [ ! -f "$CERT_DIR/ca.crt" ] || [ ! -f "$CERT_DIR/wildcard.crt" ] || [ ! -f "$
     -keyout "$CERT_DIR/wildcard.key" \
     -out "$CERT_DIR/wildcard.csr" \
     -subj '/CN=localhost' \
-    -addext 'subjectAltName=DNS:localhost,DNS:dockhand.localhost,DNS:s3.localhost,DNS:storage.localhost,DNS:catalog.localhost' \
+    -addext 'subjectAltName=DNS:localhost,DNS:dockhand.localhost,DNS:s3.localhost,DNS:storage.localhost,DNS:catalog.localhost,DNS:keycloak.localhost' \
     -addext 'basicConstraints=critical,CA:FALSE' \
     -addext 'keyUsage=critical,digitalSignature,keyEncipherment' \
     -addext 'extendedKeyUsage=serverAuth'

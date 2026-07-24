@@ -18,3 +18,8 @@ catalog.localhost {
     reverse_proxy lakekeeper:8181
     tls /etc/caddy/certificates/wildcard.crt /etc/caddy/certificates/wildcard.key
 }
+
+keycloak.localhost {
+    reverse_proxy keycloak:8080
+    tls /etc/caddy/certificates/wildcard.crt /etc/caddy/certificates/wildcard.key
+}
