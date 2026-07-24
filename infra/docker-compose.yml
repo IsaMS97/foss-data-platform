@@ -117,6 +117,10 @@ services:
         condition: service_completed_successfully
       migrate:
         condition: service_completed_successfully
+      rustfs-init:
+        condition: service_completed_successfully
+      keycloak:
+        condition: service_started
     environment: &lakekeeper-environment
       - LAKEKEEPER__PG_DATABASE_URL_READ=postgresql://postgres:postgres@db:5432/postgres
       - LAKEKEEPER__PG_DATABASE_URL_WRITE=postgresql://postgres:postgres@db:5432/postgres
