@@ -19,12 +19,23 @@ Configured values in `infra/docker-compose.yml`:
 
 The matching Keycloak realm import is defined in `infra/keycloak/realm-import.json` and includes the `lakekeeper` client plus the `lakekeeper` client scope with an audience mapper.
 
+Lakekeeper also boots with a default warehouse named `lakehouse` that points at the `lakehouse` bucket in RustFS.
+
 ## Demo login
 
 After startup, sign in to Lakekeeper UI with the imported demo user:
 
 - Username: `demo-developer`
 - Password: `demo-developer`
+
+## Machine auth
+
+The Keycloak import also provisions a machine client for query engines:
+
+- Client ID: `spark`
+- Client secret: `spark-local-dev-secret`
+
+Use the client-credentials flow against `https://keycloak.localhost/realms/foss-platform/protocol/openid-connect/token` with the `lakekeeper` audience already mapped into the token.
 
 ## Notes
 

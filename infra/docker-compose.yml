@@ -147,6 +147,44 @@ services:
     networks:
       proxy:
 
+  lakekeeper-bootstrap:
+    image: python:3.13-slim
+    restart: "no"
+    depends_on:
+      lakekeeper:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      rustfs-init:
+        condition: service_completed_successfully
+    environment:
+      - LAKEKEEPER_BOOTSTRAP_MANAGEMENT_URL=http://lakekeeper:8181/management/v1
+      - LAKEKEEPER_BOOTSTRAP_TOKEN_ENDPOINT=https://keycloak.localhost/realms/foss-platform/protocol/openid-connect/token
+      - LAKEKEEPER_BOOTSTRAP_CLIENT_ID=spark
+      - LAKEKEEPER_BOOTSTRAP_CLIENT_SECRET=spark-local-dev-secret
+      - LAKEKEEPER_BOOTSTRAP_SCOPE=openid profile
+      - LAKEKEEPER_BOOTSTRAP_WAREHOUSE_NAME=lakehouse
+      - LAKEKEEPER_BOOTSTRAP_BUCKET=lakehouse
+      - LAKEKEEPER_BOOTSTRAP_REGION=local-01
+      - LAKEKEEPER_BOOTSTRAP_ENDPOINT=http://rustfs:9000
+      - LAKEKEEPER_BOOTSTRAP_KEY_PREFIX=
+      - LAKEKEEPER_BOOTSTRAP_USER_NAME=Lakekeeper bootstrap
+      - LAKEKEEPER_BOOTSTRAP_USER_EMAIL=lakekeeper-bootstrap@example.local
+      - RUSTFS_ACCESS_KEY=${RUSTFS_ACCESS_KEY:-rustfsadmin}
+      - RUSTFS_SECRET_KEY=${RUSTFS_SECRET_KEY}
+      - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+      - REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+    extra_hosts:
+      - "keycloak.localhost:host-gateway"
+    volumes:
+      - ./certificates/combined-ca.crt:/etc/ssl/certs/ca-certificates.crt:ro
+      - ./lakekeeper/bootstrap.py:/bootstrap/bootstrap.py:ro
+    entrypoint: ["python", "/bootstrap/bootstrap.py"]
+    networks:
+      proxy:
+
 
   migrate:
     image: *lakekeeper-image
