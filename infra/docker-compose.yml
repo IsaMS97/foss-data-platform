@@ -123,6 +123,7 @@ services:
         condition: service_healthy
     extra_hosts:
       - "keycloak.localhost:host-gateway"
+      - "s3.localhost:host-gateway"
     environment: &lakekeeper-environment
       - LAKEKEEPER__PG_DATABASE_URL_READ=postgresql://postgres:postgres@db:5432/postgres
       - LAKEKEEPER__PG_DATABASE_URL_WRITE=postgresql://postgres:postgres@db:5432/postgres
@@ -168,7 +169,7 @@ services:
       - LAKEKEEPER_BOOTSTRAP_WAREHOUSE_NAME=lakehouse
       - LAKEKEEPER_BOOTSTRAP_BUCKET=lakehouse
       - LAKEKEEPER_BOOTSTRAP_REGION=local-01
-      - LAKEKEEPER_BOOTSTRAP_ENDPOINT=http://rustfs:9000
+      - LAKEKEEPER_BOOTSTRAP_ENDPOINT=https://s3.localhost
       - LAKEKEEPER_BOOTSTRAP_KEY_PREFIX=
       - LAKEKEEPER_BOOTSTRAP_USER_NAME=Lakekeeper bootstrap
       - LAKEKEEPER_BOOTSTRAP_USER_EMAIL=lakekeeper-bootstrap@example.local
@@ -178,6 +179,7 @@ services:
       - REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
     extra_hosts:
       - "keycloak.localhost:host-gateway"
+      - "s3.localhost:host-gateway"
     volumes:
       - ./certificates/combined-ca.crt:/etc/ssl/certs/ca-certificates.crt:ro
       - ./lakekeeper/bootstrap.py:/bootstrap/bootstrap.py:ro

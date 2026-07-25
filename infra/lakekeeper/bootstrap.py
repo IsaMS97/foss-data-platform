@@ -175,7 +175,7 @@ def ensure_warehouse(base_url: str, context: ssl.SSLContext, token: str) -> None
                     "type": "s3",
                     "bucket": os.getenv("LAKEKEEPER_BOOTSTRAP_BUCKET", "lakehouse"),
                     "region": os.getenv("LAKEKEEPER_BOOTSTRAP_REGION", "local-01"),
-                    "endpoint": os.getenv("LAKEKEEPER_BOOTSTRAP_ENDPOINT", "http://rustfs:9000"),
+                    "endpoint": os.getenv("LAKEKEEPER_BOOTSTRAP_ENDPOINT", "https://s3.localhost"),
                     "key-prefix": os.getenv("LAKEKEEPER_BOOTSTRAP_KEY_PREFIX", ""),
                     "flavor": "s3-compat",
                     "path-style-access": True,

@@ -20,3 +20,9 @@ infra/.env
 !/infra/rustfs_data/.gitkeep
 /infra/rustfs_logs/*
 !/infra/rustfs_logs/.gitkeep
+
+### Python generated/local ###
+__pycache__/
+*.py[cod]
+.python-version
+__marimo__/

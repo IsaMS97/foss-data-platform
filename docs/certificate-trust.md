@@ -57,3 +57,9 @@ Then reopen the browser.
 - The file you want to trust is `infra/certificates/ca.crt`.
 - If a browser still warns after importing the CA, close and reopen the browser completely.
 - If Docker Compose is run from WSL, browser trust still needs to be configured in the environment where the browser itself is running.
+
+## Python tooling note
+
+Some Python HTTP clients can use a packaged CA bundle (for example, certifi) instead of your OS trust store.
+
+Make sure `pip-system-certs` is included so Python is patched to use system trust.
