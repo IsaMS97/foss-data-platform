@@ -4,6 +4,15 @@ services:
     image: alpine:3.20
     container_name: certgen
     restart: "no"
+    environment:
+      - PLATFORM_BASE_DOMAIN=${PLATFORM_BASE_DOMAIN:-localhost}
+      - DOCKHAND_PUBLIC_HOST=${DOCKHAND_PUBLIC_HOST:-dockhand.${PLATFORM_BASE_DOMAIN:-localhost}}
+      - S3_PUBLIC_HOST=${S3_PUBLIC_HOST:-s3.${PLATFORM_BASE_DOMAIN:-localhost}}
+      - STORAGE_PUBLIC_HOST=${STORAGE_PUBLIC_HOST:-storage.${PLATFORM_BASE_DOMAIN:-localhost}}
+      - CATALOG_PUBLIC_HOST=${CATALOG_PUBLIC_HOST:-catalog.${PLATFORM_BASE_DOMAIN:-localhost}}
+      - KEYCLOAK_PUBLIC_HOST=${KEYCLOAK_PUBLIC_HOST:-keycloak.${PLATFORM_BASE_DOMAIN:-localhost}}
+      - CERT_CN=${CERT_CN:-${PLATFORM_BASE_DOMAIN:-localhost}}
+      - CERT_SAN=${CERT_SAN:-}
     volumes:
       - ./certificates:/certs
       - ./certificates/bootstrap.sh:/bootstrap.sh:ro
@@ -22,6 +31,12 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      - DOCKHAND_PUBLIC_HOST=${DOCKHAND_PUBLIC_HOST:-dockhand.${PLATFORM_BASE_DOMAIN:-localhost}}
+      - S3_PUBLIC_HOST=${S3_PUBLIC_HOST:-s3.${PLATFORM_BASE_DOMAIN:-localhost}}
+      - STORAGE_PUBLIC_HOST=${STORAGE_PUBLIC_HOST:-storage.${PLATFORM_BASE_DOMAIN:-localhost}}
+      - CATALOG_PUBLIC_HOST=${CATALOG_PUBLIC_HOST:-catalog.${PLATFORM_BASE_DOMAIN:-localhost}}
+      - KEYCLOAK_PUBLIC_HOST=${KEYCLOAK_PUBLIC_HOST:-keycloak.${PLATFORM_BASE_DOMAIN:-localhost}}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
@@ -41,7 +56,7 @@ services:
       keycloak:
         condition: service_started
     extra_hosts:
-      - "keycloak.localhost:host-gateway"
+      - "${KEYCLOAK_PUBLIC_HOST:-keycloak.${PLATFORM_BASE_DOMAIN:-localhost}}:host-gateway"
     expose:
       - "3000" # internal only
     volumes:
@@ -122,17 +137,17 @@ services:
       keycloak:
         condition: service_healthy
     extra_hosts:
-      - "keycloak.localhost:host-gateway"
-      - "s3.localhost:host-gateway"
+      - "${KEYCLOAK_PUBLIC_HOST:-keycloak.${PLATFORM_BASE_DOMAIN:-localhost}}:host-gateway"
+      - "${S3_PUBLIC_HOST:-s3.${PLATFORM_BASE_DOMAIN:-localhost}}:host-gateway"
     environment: &lakekeeper-environment
       - LAKEKEEPER__PG_DATABASE_URL_READ=postgresql://postgres:postgres@db:5432/postgres
       - LAKEKEEPER__PG_DATABASE_URL_WRITE=postgresql://postgres:postgres@db:5432/postgres
-      - LAKEKEEPER__OPENID_PROVIDER_URI=https://keycloak.localhost/realms/foss-platform
+      - LAKEKEEPER__OPENID_PROVIDER_URI=https://${KEYCLOAK_PUBLIC_HOST:-keycloak.${PLATFORM_BASE_DOMAIN:-localhost}}/realms/foss-platform
       - LAKEKEEPER__PG_ENCRYPTION_KEY=${LAKEKEEPER__PG_ENCRYPTION_KEY:-This-is-NOT-Secure!}
       - LAKEKEEPER__OPENID_AUDIENCE=lakekeeper
-      - LAKEKEEPER__OPENID_ADDITIONAL_ISSUERS=https://keycloak.localhost/realms/foss-platform
+      - LAKEKEEPER__OPENID_ADDITIONAL_ISSUERS=https://${KEYCLOAK_PUBLIC_HOST:-keycloak.${PLATFORM_BASE_DOMAIN:-localhost}}/realms/foss-platform
       - LAKEKEEPER__UI__OPENID_CLIENT_ID=lakekeeper
-      - LAKEKEEPER__UI__OPENID_PROVIDER_URI=https://keycloak.localhost/realms/foss-platform
+      - LAKEKEEPER__UI__OPENID_PROVIDER_URI=https://${KEYCLOAK_PUBLIC_HOST:-keycloak.${PLATFORM_BASE_DOMAIN:-localhost}}/realms/foss-platform
       - 'LAKEKEEPER__UI__OPENID_SCOPE=openid profile'
     command: [ "serve" ]
     healthcheck:
@@ -162,14 +177,14 @@ services:
         condition: service_completed_successfully
     environment:
       - LAKEKEEPER_BOOTSTRAP_MANAGEMENT_URL=http://lakekeeper:8181/management/v1
-      - LAKEKEEPER_BOOTSTRAP_TOKEN_ENDPOINT=https://keycloak.localhost/realms/foss-platform/protocol/openid-connect/token
+      - LAKEKEEPER_BOOTSTRAP_TOKEN_ENDPOINT=https://${KEYCLOAK_PUBLIC_HOST:-keycloak.${PLATFORM_BASE_DOMAIN:-localhost}}/realms/foss-platform/protocol/openid-connect/token
       - LAKEKEEPER_BOOTSTRAP_CLIENT_ID=spark
       - LAKEKEEPER_BOOTSTRAP_CLIENT_SECRET=spark-local-dev-secret
       - LAKEKEEPER_BOOTSTRAP_SCOPE=openid profile
       - LAKEKEEPER_BOOTSTRAP_WAREHOUSE_NAME=lakehouse
       - LAKEKEEPER_BOOTSTRAP_BUCKET=lakehouse
       - LAKEKEEPER_BOOTSTRAP_REGION=local-01
-      - LAKEKEEPER_BOOTSTRAP_ENDPOINT=https://s3.localhost
+      - LAKEKEEPER_BOOTSTRAP_ENDPOINT=https://${S3_PUBLIC_HOST:-s3.${PLATFORM_BASE_DOMAIN:-localhost}}
       - LAKEKEEPER_BOOTSTRAP_KEY_PREFIX=
       - LAKEKEEPER_BOOTSTRAP_USER_NAME=Lakekeeper bootstrap
       - LAKEKEEPER_BOOTSTRAP_USER_EMAIL=lakekeeper-bootstrap@example.local
@@ -178,8 +193,8 @@ services:
       - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
       - REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
     extra_hosts:
-      - "keycloak.localhost:host-gateway"
-      - "s3.localhost:host-gateway"
+      - "${KEYCLOAK_PUBLIC_HOST:-keycloak.${PLATFORM_BASE_DOMAIN:-localhost}}:host-gateway"
+      - "${S3_PUBLIC_HOST:-s3.${PLATFORM_BASE_DOMAIN:-localhost}}:host-gateway"
     volumes:
       - ./certificates/combined-ca.crt:/etc/ssl/certs/ca-certificates.crt:ro
       - ./lakekeeper/bootstrap.py:/bootstrap/bootstrap.py:ro
@@ -252,14 +267,17 @@ services:
       - KC_DB_URL=jdbc:postgresql://keycloak-db:5432/keycloak
       - KC_DB_USERNAME=keycloak
       - KC_DB_PASSWORD=${KEYCLOAK_DB_PASSWORD:-keycloak}
-      - KC_HOSTNAME=keycloak.localhost
+      - KC_HOSTNAME=${KEYCLOAK_PUBLIC_HOST:-keycloak.${PLATFORM_BASE_DOMAIN:-localhost}}
       - KC_HOSTNAME_STRICT=false
-      - KC_TRUSTED_HOSTS=keycloak.localhost,localhost
+      - KC_TRUSTED_HOSTS=${KEYCLOAK_PUBLIC_HOST:-keycloak.${PLATFORM_BASE_DOMAIN:-localhost}},localhost
       - KC_HTTP_ENABLED=true
       - KC_PROXY_HEADERS=xforwarded
       - KC_HEALTH_ENABLED=true
       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN:-admin}
       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      - KEYCLOAK_PUBLIC_HOST=${KEYCLOAK_PUBLIC_HOST:-keycloak.${PLATFORM_BASE_DOMAIN:-localhost}}
+      - DOCKHAND_PUBLIC_HOST=${DOCKHAND_PUBLIC_HOST:-dockhand.${PLATFORM_BASE_DOMAIN:-localhost}}
+      - CATALOG_PUBLIC_HOST=${CATALOG_PUBLIC_HOST:-catalog.${PLATFORM_BASE_DOMAIN:-localhost}}
     volumes:
       - ./keycloak:/opt/keycloak/data/import:ro
     expose:

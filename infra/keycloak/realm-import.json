@@ -37,7 +37,7 @@
     {
       "clientId": "dockhand-app",
       "name": "Dockhand",
-      "description": "OIDC client for Dockhand at https://dockhand.localhost",
+      "description": "OIDC client for Dockhand at https://${DOCKHAND_PUBLIC_HOST}",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
@@ -48,13 +48,13 @@
       "serviceAccountsEnabled": false,
       "implicitFlowEnabled": false,
       "redirectUris": [
-        "https://dockhand.localhost/api/auth/oidc/callback"
+        "https://${DOCKHAND_PUBLIC_HOST}/api/auth/oidc/callback"
       ],
       "webOrigins": [
-        "https://dockhand.localhost"
+        "https://${DOCKHAND_PUBLIC_HOST}"
       ],
       "attributes": {
-        "post.logout.redirect.uris": "https://dockhand.localhost/*"
+        "post.logout.redirect.uris": "https://${DOCKHAND_PUBLIC_HOST}/*"
       },
       "protocolMappers": [
         {
@@ -76,7 +76,7 @@
     {
       "clientId": "lakekeeper",
       "name": "Lakekeeper Catalog",
-      "description": "Public OIDC client for Lakekeeper UI at https://catalog.localhost",
+      "description": "Public OIDC client for Lakekeeper UI at https://${CATALOG_PUBLIC_HOST}",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": true,
@@ -85,13 +85,13 @@
       "serviceAccountsEnabled": false,
       "implicitFlowEnabled": false,
       "redirectUris": [
-        "https://catalog.localhost/ui/callback"
+        "https://${CATALOG_PUBLIC_HOST}/ui/callback"
       ],
       "webOrigins": [
-        "https://catalog.localhost"
+        "https://${CATALOG_PUBLIC_HOST}"
       ],
       "attributes": {
-        "post.logout.redirect.uris": "https://catalog.localhost/*",
+        "post.logout.redirect.uris": "https://${CATALOG_PUBLIC_HOST}/*",
         "oauth2.device.authorization.grant.enabled": "true"
       },
       "protocolMappers": [

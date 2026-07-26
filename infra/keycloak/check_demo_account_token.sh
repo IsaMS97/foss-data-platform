@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-BASE_URL="${KEYCLOAK_BASE_URL:-https://keycloak.localhost}"
+BASE_URL="${KEYCLOAK_BASE_URL:-https://${KEYCLOAK_PUBLIC_HOST:-keycloak.${PLATFORM_BASE_DOMAIN:-localhost}}}"
 REALM="${KEYCLOAK_REALM:-foss-platform}"
 USER="${KEYCLOAK_USER:-demo-developer}"
 PASS="${KEYCLOAK_PASS:-demo-developer}"

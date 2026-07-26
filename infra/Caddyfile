@@ -1,25 +1,25 @@
 # Dockhand service
-dockhand.localhost {
+{$DOCKHAND_PUBLIC_HOST:dockhand.localhost} {
     reverse_proxy dockhand:3000
     tls /etc/caddy/certificates/wildcard.crt /etc/caddy/certificates/wildcard.key
 }
 
-s3.localhost {
+{$S3_PUBLIC_HOST:s3.localhost} {
     reverse_proxy rustfs:9000
     tls /etc/caddy/certificates/wildcard.crt /etc/caddy/certificates/wildcard.key
 }
 
-storage.localhost {
+{$STORAGE_PUBLIC_HOST:storage.localhost} {
     reverse_proxy rustfs:9001
     tls /etc/caddy/certificates/wildcard.crt /etc/caddy/certificates/wildcard.key
 }
 
-catalog.localhost {
+{$CATALOG_PUBLIC_HOST:catalog.localhost} {
     reverse_proxy lakekeeper:8181
     tls /etc/caddy/certificates/wildcard.crt /etc/caddy/certificates/wildcard.key
 }
 
-keycloak.localhost {
+{$KEYCLOAK_PUBLIC_HOST:keycloak.localhost} {
     reverse_proxy keycloak:8080
     tls /etc/caddy/certificates/wildcard.crt /etc/caddy/certificates/wildcard.key
 }

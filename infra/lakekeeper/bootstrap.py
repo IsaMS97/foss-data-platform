@@ -64,10 +64,9 @@ def request_json(
 
 
 def request_token(context: ssl.SSLContext) -> str:
-    token_endpoint = os.getenv(
-        "LAKEKEEPER_BOOTSTRAP_TOKEN_ENDPOINT",
-        "https://keycloak.localhost/realms/foss-platform/protocol/openid-connect/token",
-    )
+    token_endpoint = os.getenv("LAKEKEEPER_BOOTSTRAP_TOKEN_ENDPOINT")
+    if not token_endpoint:
+        raise RuntimeError("LAKEKEEPER_BOOTSTRAP_TOKEN_ENDPOINT must be set")
     form_fields = {
         "client_id": os.getenv("LAKEKEEPER_BOOTSTRAP_CLIENT_ID", "spark"),
         "scope": os.getenv("LAKEKEEPER_BOOTSTRAP_SCOPE", "openid profile"),
@@ -156,6 +155,10 @@ def ensure_warehouse(base_url: str, context: ssl.SSLContext, token: str) -> None
     if any(warehouse.get("name") == warehouse_name for warehouse in warehouses):
         return
 
+    warehouse_endpoint = os.getenv("LAKEKEEPER_BOOTSTRAP_ENDPOINT")
+    if not warehouse_endpoint:
+        raise RuntimeError("LAKEKEEPER_BOOTSTRAP_ENDPOINT must be set")
+
     try:
         request_json(
             "POST",
@@ -175,7 +178,7 @@ def ensure_warehouse(base_url: str, context: ssl.SSLContext, token: str) -> None
                     "type": "s3",
                     "bucket": os.getenv("LAKEKEEPER_BOOTSTRAP_BUCKET", "lakehouse"),
                     "region": os.getenv("LAKEKEEPER_BOOTSTRAP_REGION", "local-01"),
-                    "endpoint": os.getenv("LAKEKEEPER_BOOTSTRAP_ENDPOINT", "https://s3.localhost"),
+                    "endpoint": warehouse_endpoint,
                     "key-prefix": os.getenv("LAKEKEEPER_BOOTSTRAP_KEY_PREFIX", ""),
                     "flavor": "s3-compat",
                     "path-style-access": True,

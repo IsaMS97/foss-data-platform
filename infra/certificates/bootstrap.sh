@@ -2,6 +2,14 @@
 set -eu
 
 CERT_DIR=/certs
+PLATFORM_BASE_DOMAIN="${PLATFORM_BASE_DOMAIN:-localhost}"
+DOCKHAND_PUBLIC_HOST="${DOCKHAND_PUBLIC_HOST:-dockhand.${PLATFORM_BASE_DOMAIN}}"
+S3_PUBLIC_HOST="${S3_PUBLIC_HOST:-s3.${PLATFORM_BASE_DOMAIN}}"
+STORAGE_PUBLIC_HOST="${STORAGE_PUBLIC_HOST:-storage.${PLATFORM_BASE_DOMAIN}}"
+CATALOG_PUBLIC_HOST="${CATALOG_PUBLIC_HOST:-catalog.${PLATFORM_BASE_DOMAIN}}"
+KEYCLOAK_PUBLIC_HOST="${KEYCLOAK_PUBLIC_HOST:-keycloak.${PLATFORM_BASE_DOMAIN}}"
+CERT_CN="${CERT_CN:-${PLATFORM_BASE_DOMAIN}}"
+CERT_SAN="${CERT_SAN:-DNS:localhost,DNS:${PLATFORM_BASE_DOMAIN},DNS:${DOCKHAND_PUBLIC_HOST},DNS:${S3_PUBLIC_HOST},DNS:${STORAGE_PUBLIC_HOST},DNS:${CATALOG_PUBLIC_HOST},DNS:${KEYCLOAK_PUBLIC_HOST}}"
 
 mkdir -p "$CERT_DIR"
 
@@ -28,8 +36,8 @@ if [ ! -f "$CERT_DIR/ca.crt" ] || [ ! -f "$CERT_DIR/wildcard.crt" ] || [ ! -f "$
   openssl req -new -newkey rsa:2048 -nodes \
     -keyout "$CERT_DIR/wildcard.key" \
     -out "$CERT_DIR/wildcard.csr" \
-    -subj '/CN=localhost' \
-    -addext 'subjectAltName=DNS:localhost,DNS:dockhand.localhost,DNS:s3.localhost,DNS:storage.localhost,DNS:catalog.localhost,DNS:keycloak.localhost' \
+    -subj "/CN=$CERT_CN" \
+    -addext "subjectAltName=$CERT_SAN" \
     -addext 'basicConstraints=critical,CA:FALSE' \
     -addext 'keyUsage=critical,digitalSignature,keyEncipherment' \
     -addext 'extendedKeyUsage=serverAuth'

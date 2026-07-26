@@ -1,8 +1,32 @@
 # Prerequisites
 
-## Serve side
+## Server side
 
 Server must have docker and docker compose installed
+
+## Environment variables
+
+Create and edit the environment file:
+
+```bash
+nano .env
+```
+
+Set the required RustFS credentials:
+
+```bash
+# RustFS Access Key (username)
+RUSTFS_ACCESS_KEY=rustfsadmin
+
+# RustFS Secret Key (password - CHANGE THIS!)
+RUSTFS_SECRET_KEY=your-super-secure-secret-key-minimum-8-chars
+```
+
+Optional: only set this on VPS/internal DNS. For localhost, leave it unset.
+
+```bash
+PLATFORM_BASE_DOMAIN=platform.smith-data.de
+```
 
 ### RustFS
 
@@ -11,22 +35,6 @@ You can find these two folders under /infra
 
 ```bash
 sudo chown -R 10001:10001 rustfs_data rustfs_logs
-```
-
-Create and edit the enviroment file
-
-```bash
-nano .env
-```
-
-Add this to your configuration to specify your username and password. Please change the password from default to a personal choice.
-
-```bash
-# RustFS Access Key (username)
-RUSTFS_ACCESS_KEY=rustfsadmin
-
-# RustFS Secret Key (password - CHANGE THIS!)
-RUSTFS_SECRET_KEY=your-super-secure-secret-key-minimum-8-chars 
 ```
 
 ## Client side
