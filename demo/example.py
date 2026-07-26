@@ -15,7 +15,7 @@ def _():
 
 @app.cell
 def _(util):
-    cat = util.get_catalog()
+    cat = util.get_catalog("platform.smith-data.de")
     cat.create_namespace_if_not_exists("01_bronze")
     cat.create_namespace_if_not_exists("02_silver")
     cat.create_namespace_if_not_exists("03_gold")
