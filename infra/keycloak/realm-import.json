@@ -1,0 +1,174 @@
+{
+  "realm": "foss-platform",
+  "enabled": true,
+  "groups": [
+    {
+      "name": "lakekeeper-developers"
+    },
+    {
+      "name": "dockhand-users"
+    }
+  ],
+  "users": [
+    {
+      "username": "demo-developer",
+      "enabled": true,
+      "firstName": "Demo",
+      "lastName": "Developer",
+      "email": "demo-developer@example.com",
+      "emailVerified": true,
+      "realmRoles": [
+        "default-roles-foss-platform"
+      ],
+      "groups": [
+        "lakekeeper-developers",
+        "dockhand-users"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "demo-developer",
+          "temporary": false
+        }
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "dockhand-app",
+      "name": "Dockhand",
+      "description": "OIDC client for Dockhand at https://${DOCKHAND_PUBLIC_HOST}",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${DOCKHAND_OIDC_CLIENT_SECRET:-dockhand-local-dev-secret}",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "implicitFlowEnabled": false,
+      "redirectUris": [
+        "https://${DOCKHAND_PUBLIC_HOST}/api/auth/oidc/callback"
+      ],
+      "webOrigins": [
+        "https://${DOCKHAND_PUBLIC_HOST}"
+      ],
+      "attributes": {
+        "post.logout.redirect.uris": "https://${DOCKHAND_PUBLIC_HOST}/*"
+      },
+      "protocolMappers": [
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "claim.name": "groups",
+            "full.path": "false",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "lakekeeper",
+      "name": "Lakekeeper Catalog",
+      "description": "Public OIDC client for Lakekeeper UI at https://${CATALOG_PUBLIC_HOST}",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "implicitFlowEnabled": false,
+      "redirectUris": [
+        "https://${CATALOG_PUBLIC_HOST}/ui/callback"
+      ],
+      "webOrigins": [
+        "https://${CATALOG_PUBLIC_HOST}"
+      ],
+      "attributes": {
+        "post.logout.redirect.uris": "https://${CATALOG_PUBLIC_HOST}/*",
+        "oauth2.device.authorization.grant.enabled": "true"
+      },
+      "protocolMappers": [
+        {
+          "name": "Add lakekeeper Audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "lakekeeper",
+            "id.token.claim": "false",
+            "access.token.claim": "true",
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "false"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "roles",
+        "profile",
+        "basic",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    },
+    {
+      "clientId": "spark",
+      "name": "Spark",
+      "description": "Machine user example for Lakekeeper",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "spark-local-dev-secret",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "implicitFlowEnabled": false,
+      "redirectUris": [
+        "/*"
+      ],
+      "webOrigins": [
+        "/*"
+      ],
+      "protocolMappers": [
+        {
+          "name": "Add lakekeeper Audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "lakekeeper",
+            "id.token.claim": "false",
+            "access.token.claim": "true",
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "clientScopeMappings": {
+    "account": [
+      {
+        "client": "account-console",
+        "roles": [
+          "manage-account",
+          "view-groups"
+        ]
+      }
+    ]
+  }
+}
